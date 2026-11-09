@@ -49,10 +49,12 @@ const { title = "Mona's Bookmark Manager App" } = Astro.props;
       }
       :root {
         color-scheme: light dark;
-        --accent: #3b82f6;
-        --border: #8883;
-        --muted: color-mix(in srgb, currentColor 60%, transparent);
-        --radius: 0.6rem;
+        --accent: #c75b37;
+        --accent-soft: color-mix(in srgb, var(--accent) 12%, transparent);
+        --border: color-mix(in srgb, currentColor 14%, transparent);
+        --muted: color-mix(in srgb, currentColor 58%, transparent);
+        --surface: color-mix(in srgb, Canvas 92%, var(--accent) 8%);
+        --radius: 1rem;
         --font-body: 'Monaspace Neon', ui-monospace, 'SF Mono', 'Cascadia Code', monospace;
         --font-head: 'Monaspace Xenon', 'Monaspace Neon', ui-monospace, monospace;
       }
@@ -60,100 +62,124 @@ const { title = "Mona's Bookmark Manager App" } = Astro.props;
       body {
         font-family: var(--font-body);
         line-height: 1.5;
-        max-width: 40rem;
+        max-width: 48rem;
+        min-height: 100vh;
         margin: 0 auto;
-        padding: 2.5rem 1.25rem 4rem;
+        padding: clamp(2.5rem, 8vw, 5rem) 1.25rem 4rem;
+        background:
+          radial-gradient(ellipse at 10% 0%, var(--accent-soft), transparent 34rem),
+          Canvas;
       }
-      header { margin-bottom: 1.5rem; }
-      h1 { margin: 0 0 0.25rem; font-size: 1.75rem; font-family: var(--font-head); letter-spacing: -0.01em; }
-      .tagline { margin: 0; color: var(--muted); }
+      header { margin-bottom: 2rem; }
+      h1 { margin: 0 0 0.5rem; font-size: clamp(1.7rem, 5vw, 2.35rem); line-height: 1.2; font-family: var(--font-head); letter-spacing: -0.035em; }
+      .tagline { max-width: 38rem; margin: 0; color: var(--muted); }
+      code { color: color-mix(in srgb, var(--accent) 85%, currentColor); }
 
       form {
         display: flex;
         flex-wrap: wrap;
-        gap: 0.5rem;
+        gap: 0.75rem;
         align-items: end;
-        margin: 1.5rem 0 0.5rem;
-      }
-      .field { display: flex; flex-direction: column; gap: 0.35rem; flex: 1 1 16rem; }
-      label { font-size: 0.85rem; font-weight: 600; }
-      input {
-        padding: 0.6rem 0.7rem;
+        margin: 1.5rem 0 0.6rem;
+        padding: 1rem;
         border: 1px solid var(--border);
-        border-radius: var(--radius);
+        border-radius: calc(var(--radius) + 0.2rem);
+        background: var(--surface);
+        box-shadow: 0 1rem 2.5rem color-mix(in srgb, currentColor 6%, transparent);
+      }
+      .field { display: flex; flex-direction: column; gap: 0.4rem; flex: 1 1 16rem; }
+      label { font-size: 0.82rem; font-weight: 600; }
+      input {
+        min-height: 2.9rem;
+        padding: 0.7rem 0.8rem;
+        border: 1px solid var(--border);
+        border-radius: 0.75rem;
         font: inherit;
         background: transparent;
         color: inherit;
       }
       input:focus-visible,
-      button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+      button:focus-visible,
+      a:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
       button {
-        padding: 0.6rem 1rem;
+        min-height: 2.9rem;
+        padding: 0.65rem 1rem;
         border: 1px solid transparent;
-        border-radius: var(--radius);
+        border-radius: 0.75rem;
         background: var(--accent);
         color: #fff;
         font: inherit;
         font-weight: 600;
         cursor: pointer;
       }
-      button:hover { filter: brightness(1.05); }
+      button:hover { filter: brightness(1.08); transform: translateY(-1px); }
       .hint { margin: 0 0 1.5rem; font-size: 0.8rem; color: var(--muted); }
+      .feedback { min-height: 1.5em; margin: -1rem 0 1rem; color: var(--accent); font-size: 0.8rem; }
 
       #list-header {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 0.75rem;
-        margin: 0.5rem 0;
+        margin: 2rem 0 0.75rem;
       }
-      .list-title { margin: 0; font-size: 1rem; font-family: var(--font-head); }
+      #list-header[hidden] { display: none; }
+      .list-title { margin: 0; font-size: 1.05rem; font-family: var(--font-head); }
       .clear {
         background: transparent;
         color: inherit;
         border: 1px solid var(--border);
+        min-height: 2.3rem;
         padding: 0.35rem 0.7rem;
         font-size: 0.8rem;
         font-weight: 500;
       }
       .clear:hover { border-color: currentColor; }
 
-      ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+      ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.65rem; }
       li.bookmark {
         display: flex;
         flex-wrap: wrap;
         align-items: center;
-        gap: 0.5rem 0.75rem;
-        padding: 0.75rem 0.9rem;
+        gap: 0.65rem 1rem;
+        padding: 0.85rem 1rem;
         border: 1px solid var(--border);
         border-radius: var(--radius);
+        background: var(--surface);
+        transition: border-color 150ms ease, transform 150ms ease;
       }
-      .bookmark .url { flex: 1 1 12rem; overflow-wrap: anywhere; }
+      li.bookmark:hover { border-color: color-mix(in srgb, var(--accent) 42%, var(--border)); transform: translateY(-1px); }
+      .bookmark-label { flex: 1 1 15rem; overflow-wrap: anywhere; }
+      .bookmark .url { color: inherit; text-decoration-color: color-mix(in srgb, var(--accent) 55%, transparent); text-underline-offset: 0.2em; }
       .bookmark .slug {
-        font-family: ui-monospace, "SF Mono", monospace;
+        font-family: var(--font-head);
         font-size: 0.85rem;
         padding: 0.15rem 0.5rem;
-        border-radius: 999px;
-        background: color-mix(in srgb, var(--accent) 18%, transparent);
+        border: 1px solid color-mix(in srgb, var(--accent) 28%, transparent);
+        border-radius: 0.45rem;
+        background: var(--accent-soft);
+        white-space: nowrap;
       }
       .bookmark .copy {
         background: transparent;
         color: inherit;
         border: 1px solid var(--border);
-        padding: 0.3rem 0.6rem;
+        min-height: 2.3rem;
+        padding: 0.3rem 0.7rem;
         font-size: 0.8rem;
         font-weight: 500;
       }
       .empty {
         margin: 0;
-        padding: 1.5rem;
+        padding: 2rem 1.25rem;
         text-align: center;
         color: var(--muted);
-        border: 1px dashed var(--border);
-        border-radius: var(--radius);
+        border: 1px dashed color-mix(in srgb, var(--accent) 35%, var(--border));
+        border-radius: calc(var(--radius) + 0.2rem);
+        background: var(--surface);
       }
 
-      footer { margin-top: 2.5rem; font-size: 0.8rem; color: var(--muted); }
+      footer { margin-top: 2.5rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: 0.8rem; color: var(--muted); }
     </style>
   </head>
   <body>
